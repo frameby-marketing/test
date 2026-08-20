@@ -121,6 +121,15 @@
   .step-num{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14.5px;flex:none;}
   .step-card .st{font-size:13.5px;font-weight:700;margin-bottom:5px;}
   .step-card .sd{font-size:12px;color:var(--sub);line-height:1.55;}
+
+  /* tab navigation */
+  .tabnav{display:flex;gap:8px;background:var(--track);border:1px solid var(--card-border);border-radius:14px;padding:5px;margin-bottom:22px;}
+  .tabnav button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;background:transparent;color:var(--sub);padding:11px 16px;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;transition:background .15s,color .15s;}
+  .tabnav button.active{background:var(--card);color:var(--text);box-shadow:0 1px 0 rgba(0,0,0,.02);}
+  .tabnav button .tnote{font-weight:500;color:var(--sub);font-size:11.5px;}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+  .mini-table td, .mini-table th{padding:9px 12px;}
 </style>
 </head>
 <body>
@@ -128,7 +137,7 @@
   <header>
     <div>
       <h1>자사몰 구매전환율 하락 원인 분석</h1>
-      <div class="sub">8월 1일 ~ 8월 19일 일별 데이터 기반 진단 · 자사몰 · 네이버 교차검증 포함</div>
+      <div class="sub">8월 1일 ~ 8월 19일 일별 데이터 기반 진단 · 자사몰 · 네이버 · Meta 광고 교차검증 포함</div>
     </div>
     <div class="topbar-actions">
       <div class="seg-toggle" id="themeSegToggle">
@@ -138,6 +147,13 @@
       <div class="status-pill crit"><span class="dot"></span><span>8/14~ 전환율 하락 지속</span></div>
     </div>
   </header>
+
+  <div class="tabnav" id="mainTabNav">
+    <button type="button" class="tab-btn active" data-tab="site">종합 분석 (자사몰 · 네이버)</button>
+    <button type="button" class="tab-btn" data-tab="ads">Meta 광고 데이터 분석</button>
+  </div>
+
+  <div class="tab-panel active" id="tab-site">
 
   <!-- ===================== 핵심 요약 ===================== -->
   <div class="section-eyebrow">EXECUTIVE SUMMARY</div>
@@ -249,6 +265,77 @@
   <div class="section-title">다음 확인 사항 및 액션 아이템</div>
   <div class="grid-2" id="stepsRow"></div>
 
+  </div><!-- /#tab-site -->
+
+  <div class="tab-panel" id="tab-ads">
+
+  <!-- ===================== ADS EXEC SUMMARY ===================== -->
+  <div class="section-eyebrow">07&nbsp;&nbsp;META 광고 데이터 교차검증</div>
+  <div class="section-title">광고 트래픽 품질 문제인가, 자사몰 자체 문제인가</div>
+  <div class="section-desc">킥프레임 · PH · DW프로 · DW플러스 4개 제품의 Meta 광고 일별 지표(8/1~19, reach 가중평균)를 자사몰 구매전환율 하락과 대조.</div>
+  <div class="grid-4" id="adsSummaryRow"></div>
+
+  <!-- ===================== 광고 도달 추이 ===================== -->
+  <div class="section-title" style="margin-top:22px;">제품별 광고 도달(Reach) 추이 — 배송지연 이전부터 이미 하락 중</div>
+  <div class="section-desc">8/14 하락과 정확히 맞물린 절벽이 아니라, 킥프레임은 8/1부터, DW플러스는 8/7부터 이미 도달이 꺾여 있었음.</div>
+  <div class="chart-card">
+    <div class="legend" id="adsReachLegend"></div>
+    <div class="chart-wrap" style="height:300px;"><canvas id="adsReachChart"></canvas></div>
+  </div>
+
+  <div class="grid-25" style="margin-top:14px;">
+    <div class="chart-card">
+      <div class="ttl">구간별 도달 합계 감소율 (정상기 대비)</div>
+      <div class="chart-wrap" style="height:260px;"><canvas id="adsReachSegChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-label">핵심 포인트</div>
+      <div class="card-note" style="font-size:13px;color:var(--text);">4개 제품 모두 정상기 대비 정상화 후 도달이 <b style="color:var(--bad);">-82%~-94%</b> 감소. 다만 킥프레임은 8/1부터, DW플러스는 8/6→8/7(-65%)에 이미 급락 — <b>8/14 배송지연과는 별개의, 더 오래된 광고 노출 축소 추세</b>로 보임.</div>
+    </div>
+  </div>
+
+  <!-- ===================== 랜딩페이지 조회율 ===================== -->
+  <div class="section-title" style="margin-top:22px;">랜딩페이지 조회율 — 전 제품 공통 하락 (핵심 발견)</div>
+  <div class="section-desc">광고 클릭 후 실제 랜딩페이지가 뜨는 비율이 제품·캠페인 종류와 무관하게 4개 제품 전부 정상기 대비 -18%~-28% 동반 하락. 자사몰 랜딩페이지 자체의 로딩/접속 이슈 가능성을 시사.</div>
+  <div class="chart-card">
+    <div class="legend" id="adsLandingLegend"></div>
+    <div class="chart-wrap" style="height:280px;"><canvas id="adsLandingChart"></canvas></div>
+  </div>
+
+  <!-- ===================== 광고측 구매전환율 vs 자사몰 전체 전환율 ===================== -->
+  <div class="section-title" style="margin-top:22px;">광고측 구매전환율 vs 자사몰 전체 전환율 — 방향이 다르다</div>
+  <div class="section-desc">자사몰 전체 구매전환율은 급락했지만, 같은 기간 Meta 광고가 데려온 트래픽만 놓고 보면 구매전환율은 유지되거나 오히려 상승 — 광고 트래픽 품질 저하가 원인일 가능성은 낮음을 시사.</div>
+  <div class="chart-card">
+    <div class="legend" id="adsVsCvrLegend"></div>
+    <div class="chart-wrap" style="height:300px;"><canvas id="adsVsCvrChart"></canvas></div>
+  </div>
+  <div class="card-note" style="margin:10px 2px 0;font-size:12px;">* PH는 8/18~19 광고측 구매전환율 데이터 자체가 없음(Meta에서 대시 처리) — 아래 PH 카드 참고.</div>
+
+  <!-- ===================== PH 딥다이브 ===================== -->
+  <div class="section-title" style="margin-top:22px;">PH — 결제는 시작되지만 구매가 없다</div>
+  <div class="grid-25">
+    <div class="table-card">
+      <table class="mini-table" id="phAdsTable"></table>
+    </div>
+    <div class="card">
+      <div class="card-label">해석</div>
+      <div class="card-note" style="font-size:13px;color:var(--text);">PH는 자사몰·네이버 모두에서 하락한 유일한 크로스채널 제품. 광고 데이터에서도 8/18은 담기·결제·구매가 전부 미기록, 8/19는 결제시작(3.03%)까지는 발생하지만 구매는 0으로 나타남 — <b style="color:var(--bad);">결제 완료 단계 자체의 문제</b>일 가능성이 다른 제품보다 큼.</div>
+    </div>
+  </div>
+
+  <!-- ===================== 킥프레임 인앱 캠페인 ===================== -->
+  <div class="section-title" style="margin-top:22px;">킥프레임 — 8/14 신규 "랜딩링크(인앱)" 캠페인</div>
+  <div class="section-desc">8/14 site 하락 시점과 정확히 겹쳐 시작된 신규 캠페인. 최대 도달 53%까지 차지했다가 8/17~18 소멸, 8/19 12.5%로 축소. 다만 킥프레임 메인 캠페인 도달은 이미 8/1부터 감소 중이었어서 별개 이벤트로 판단.</div>
+  <div class="table-card">
+    <table id="mkTable"></table>
+  </div>
+
+  <!-- ===================== 종합 해석 ===================== -->
+  <div class="section-title" style="margin-top:22px;">종합 해석</div>
+  <div class="grid-2" id="adsSynthRow"></div>
+
+  </div><!-- /#tab-ads -->
+
   <footer>
     자사몰 구매전환율 하락 원인 분석 · 8/1–8/19 데이터 기반 · 원본 보고서(PPT)를 바탕으로 재구성한 대시보드입니다.
   </footer>
@@ -358,6 +445,66 @@ const NEXT_STEPS = [
   {n:2, t:"DW 프로 네이버 하락 원인 확인", d:"자사몰은 -11.6%로 경미한데 네이버에서만 -42.1% 하락 — 네이버 노출순위·리뷰·검색광고 소재 변경 이력 점검"},
   {n:3, t:"일자별 META 광고비 + 링크클릭수 + 광고 구매건수 통합", d:"8/1~19 전 기간 데이터를 자사몰·네이버 데이터와 결합해 광고 트래픽 문제와 자사몰 전환 문제를 구조적으로 분리"},
   {n:4, t:"8/20~22 데이터 추가 관찰", d:"자사몰 지속 하락 vs 네이버 반등 패턴이 이후에도 유지되는지 3~5일 추가 데이터로 재확인"},
+];
+
+/* ================= ADS TAB DATA ================= */
+const ADS_DAYS = DAYS;
+const ADS_PRODUCTS = ["킥프레임","PH","DW프로","DW플러스"];
+const ADS_PRODUCT_LABELS = {킥프레임:"킥프레임", PH:"PH 스탠드", DW프로:"DW 프로", DW플러스:"DW 플러스"};
+const ADS_COLOR_VAR = {킥프레임:"--accent", PH:"--bad", DW프로:"--good", DW플러스:"--accent2"};
+
+const ADS_REACH_DAILY = {
+  PH:      [7377,6143,6450,6880,6469,8701,7717,5296,3867,3246,2779,4951,7791,5801,5123,5028,5782,4628,4237],
+  DW프로:   [2397,2206,2457,2257,1989,5877,5720,4416,3489,5445,4482,3343,4255,5180,4402,4766,5019,4474,4315],
+  킥프레임: [22752,19383,18550,19014,21143,18390,12878,14523,13990,12963,10993,11795,9030,13592,17080,9978,8401,6622,6035],
+  DW플러스:[10881,10477,11905,12014,11709,9457,3302,2414,2238,2747,3083,2537,3029,2863,2638,2604,3864,3183,4503],
+};
+
+// reach-weighted 구간 합계 (정상기 8/1~13 · 배송지연 8/14~17 · 정상화 8/18~19)
+const ADS_REACH_SEG = {
+  PH:      {normal:77667, delay:21734, recovered:8865,  chg:-88.6},
+  DW프로:   {normal:48333, delay:19367, recovered:8789,  chg:-81.8},
+  킥프레임: {normal:205404,delay:49051, recovered:12657, chg:-93.8},
+  DW플러스:{normal:85793, delay:11969, recovered:7686,  chg:-91.0},
+};
+
+// 랜딩페이지 조회율 (링크클릭 → 실제 랜딩페이지 노출), reach-weighted
+const ADS_LANDING = {
+  PH:      {normal:82.91, recovered:62.53, chg:-24.6},
+  DW프로:   {normal:79.19, recovered:56.88, chg:-28.2},
+  킥프레임: {normal:86.04, recovered:70.66, chg:-17.9},
+  DW플러스:{normal:92.15, recovered:70.24, chg:-23.8},
+};
+
+// 광고측 구매전환율(purchase_rate, reach-weighted) 정상기→정상화 변화율 vs 자사몰 전체 CVR 변화율(SITE_DECLINE_3SEG)
+const ADS_PURCHASE_CHG = {
+  킥프레임: -0.5,
+  PH: null,        // 8/18~19 데이터 없음(구매 0건 추정)
+  DW프로: 69.5,
+  DW플러스: 42.2,
+};
+const SITE_CVR_CHG = { 킥프레임:-38.1, PH:-68.3, DW프로:-0.5, DW플러스:-55.9 };
+
+const PH_ADS_ROWS = [
+  {date:"정상기 평균(8/1~13)", ctr:"1.18%", landing:"82.91%", cart:"10.51%", checkout:"10.08%", purchase:"4.50%"},
+  {date:"8/18", ctr:"1.21%", landing:"54.10%", cart:"—", checkout:"—", purchase:"—"},
+  {date:"8/19", ctr:"0.92%", landing:"71.74%", cart:"3.03%", checkout:"3.03%", purchase:"—"},
+];
+
+const MK_INAPP = [
+  {date:"8/14", reach:6327, share:46.5, purchase:"3.70%"},
+  {date:"8/15", reach:9058, share:53.0, purchase:"1.03%"},
+  {date:"8/16", reach:2177, share:21.8, purchase:"2.33%"},
+  {date:"8/17", reach:null, share:0,    purchase:"—"},
+  {date:"8/18", reach:null, share:0,    purchase:"—"},
+  {date:"8/19", reach:756,  share:12.5, purchase:"—"},
+];
+
+const ADS_SYNTH = [
+  {title:"① 랜딩페이지 기술 이슈 가능성", color:"var(--bad)",
+   body:"4개 제품 전부 랜딩페이지 조회율이 정상기 대비 -18%~-28% 동반 하락. 캠페인 종류·타겟과 무관하게 동시에 나타난 현상이라 <b>자사몰 랜딩페이지 로딩·접속 자체의 기술적 문제</b>일 가능성이 높음.<br><br><b>점검 대상:</b> 랜딩페이지 로딩 속도, 모바일 접속 오류, 서버 응답시간, 픽셀/트래킹 스크립트 지연"},
+  {title:"② 광고 트래픽 품질 저하는 아닌 것으로 보임 (PH 제외)", color:"var(--good)",
+   body:"킥프레임·DW프로·DW플러스는 광고측 구매전환율이 정상기 대비 유지(-0.5%)되거나 오히려 상승(+42~70%)함. 자사몰 전체 CVR은 크게 빠졌는데 광고 트래픽 자체의 전환은 버텼다는 건 문제가 <b>광고가 아니라 자사몰(UI/UX·결제 환경 또는 비광고 트래픽) 쪽</b>에 있다는 기존 가설을 뒷받침. PH만 결제 단계 자체가 무너진 별도 케이스."},
 ];
 
 /* ================= HELPERS ================= */
@@ -578,6 +725,120 @@ function renderCrossProdChart(){
   });
 }
 
+/* ================= ADS TAB CHARTS ================= */
+function renderAdsSummary(){
+  const items = [
+    {label:"랜딩페이지 조회율 하락<br>(정상기→정상화, 전 제품)", value:"-18%~-28%", cls:"bad"},
+    {label:"광고측 구매전환율<br>(킥프레임·DW프로·DW플러스)", value:"유지·개선", cls:"good"},
+    {label:"광고 도달(Reach) 감소<br>(정상기→정상화, 전 제품)", value:"-82%~-94%", cls:"warn"},
+    {label:"PH 8/18~19<br>광고 트래픽 구매 기록", value:"0건 추정", cls:"bad"},
+  ];
+  document.getElementById("adsSummaryRow").innerHTML = items.map(it=>
+    `<div class="card"><div class="card-label">${it.label}</div><div class="card-value ${it.cls}">${it.value}</div></div>`
+  ).join("");
+}
+
+function renderAdsReachChart(){
+  document.getElementById("adsReachLegend").innerHTML = legendHtml(
+    ADS_PRODUCTS.map(p=>({color:cssVar(ADS_COLOR_VAR[p]), label:ADS_PRODUCT_LABELS[p]}))
+  );
+  destroyChart("adsReach");
+  CHARTS.adsReach = new Chart(document.getElementById("adsReachChart"), {
+    type:"line",
+    data:{ labels:ADS_DAYS, datasets: ADS_PRODUCTS.map(p=>({
+      label: ADS_PRODUCT_LABELS[p], data: ADS_REACH_DAILY[p],
+      borderColor: cssVar(ADS_COLOR_VAR[p]), backgroundColor: cssVar(ADS_COLOR_VAR[p]),
+      pointRadius:2.5, borderWidth:2, tension:.15,
+    })) },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{mode:"index", intersect:false} },
+      scales:{
+        x:{ grid:{display:false}, ticks:{color:cssVar("--sub"), font:{size:10.5}} },
+        y:{ grid:{color:cssVar("--grid")}, ticks:{color:cssVar("--sub")}, beginAtZero:true }
+      }
+    }
+  });
+}
+
+function renderAdsReachSegChart(){
+  const labels = ADS_PRODUCTS.map(p=>ADS_PRODUCT_LABELS[p]);
+  const data = ADS_PRODUCTS.map(p=>ADS_REACH_SEG[p].chg);
+  const colors = ADS_PRODUCTS.map(p=>cssVar(ADS_COLOR_VAR[p]));
+  destroyChart("adsReachSeg");
+  CHARTS.adsReachSeg = new Chart(document.getElementById("adsReachSegChart"), {
+    type:"bar",
+    plugins:[window.ChartDataLabels],
+    data:{ labels, datasets:[{ data, backgroundColor:colors, borderRadius:6, maxBarThickness:50 }] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      layout:{padding:{bottom:22}},
+      plugins:{ legend:{display:false},
+        datalabels:{ formatter:(v)=>v.toFixed(1)+"%", anchor:"end", align:"bottom", color:cssVar("--text"), font:{size:11.5, weight:"700"} } },
+      scales:{
+        x:{ grid:{display:false}, ticks:{color:cssVar("--sub"), font:{size:10.5}} },
+        y:{ grid:{color:cssVar("--grid")}, ticks:{color:cssVar("--sub"), callback:(v)=>v+"%"}, min:-100, max:5 }
+      }
+    }
+  });
+}
+
+function renderAdsLandingChart(){
+  document.getElementById("adsLandingLegend").innerHTML = legendHtml([
+    {color:cssVar("--accent"), label:"정상기 (8/1~13)"},
+    {color:cssVar("--bad"), label:"정상화 후 (8/18~19)"},
+  ]);
+  const labels = ADS_PRODUCTS.map(p=>ADS_PRODUCT_LABELS[p]);
+  destroyChart("adsLanding");
+  CHARTS.adsLanding = new Chart(document.getElementById("adsLandingChart"), {
+    type:"bar",
+    plugins:[window.ChartDataLabels],
+    data:{ labels, datasets:[
+      { label:"정상기", data:ADS_PRODUCTS.map(p=>ADS_LANDING[p].normal), backgroundColor:cssVar("--accent"), borderRadius:5, maxBarThickness:34 },
+      { label:"정상화 후", data:ADS_PRODUCTS.map(p=>ADS_LANDING[p].recovered), backgroundColor:cssVar("--bad"), borderRadius:5, maxBarThickness:34 },
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      layout:{padding:{top:22}},
+      plugins:{ legend:{display:false},
+        datalabels:{ formatter:(v)=>v.toFixed(1)+"%", anchor:"end", align:"top", color:cssVar("--text"), font:{size:10.5, weight:"700"} } },
+      scales:{
+        x:{ grid:{display:false}, ticks:{color:cssVar("--sub"), font:{size:11}} },
+        y:{ grid:{color:cssVar("--grid")}, ticks:{color:cssVar("--sub"), callback:(v)=>v+"%"}, beginAtZero:true, max:105 }
+      }
+    }
+  });
+}
+
+function renderAdsVsCvrChart(){
+  document.getElementById("adsVsCvrLegend").innerHTML = legendHtml([
+    {color:cssVar("--accent2"), label:"광고측 구매전환율 변화율"},
+    {color:cssVar("--bad"), label:"자사몰 전체 구매전환율 변화율"},
+  ]);
+  const labels = ADS_PRODUCTS.map(p=>ADS_PRODUCT_LABELS[p]);
+  destroyChart("adsVsCvr");
+  CHARTS.adsVsCvr = new Chart(document.getElementById("adsVsCvrChart"), {
+    type:"bar",
+    plugins:[window.ChartDataLabels],
+    data:{ labels, datasets:[
+      { label:"광고측 구매전환율", data:ADS_PRODUCTS.map(p=>ADS_PURCHASE_CHG[p]), backgroundColor:cssVar("--accent2"), borderRadius:5, maxBarThickness:30 },
+      { label:"자사몰 전체 CVR", data:ADS_PRODUCTS.map(p=>SITE_CVR_CHG[p]), backgroundColor:cssVar("--bad"), borderRadius:5, maxBarThickness:30 },
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false},
+        datalabels:{ formatter:(v)=> v===null ? "데이터 없음" : (v>0?"+":"")+v.toFixed(1)+"%",
+          anchor:(ctx)=> ctx.dataset.data[ctx.dataIndex]===null ? "center" : (ctx.dataset.data[ctx.dataIndex]>=0?"end":"start"),
+          align:(ctx)=> ctx.dataset.data[ctx.dataIndex]===null ? "center" : (ctx.dataset.data[ctx.dataIndex]>=0?"top":"bottom"),
+          color:cssVar("--text"), font:{size:9.5, weight:"700"} } },
+      scales:{
+        x:{ grid:{display:false}, ticks:{color:cssVar("--sub"), font:{size:10.5}} },
+        y:{ grid:{color:cssVar("--grid")}, ticks:{color:cssVar("--sub"), callback:(v)=>v+"%"}, min:-80, max:80 }
+      }
+    }
+  });
+}
+
+function renderAdsAllCharts(){
+  renderAdsReachChart(); renderAdsReachSegChart(); renderAdsLandingChart(); renderAdsVsCvrChart();
+}
+
 /* ================= STATIC SECTIONS ================= */
 function renderTimeline(){
   document.getElementById("timelineRow").innerHTML = TIMELINE.map(t=>
@@ -640,6 +901,26 @@ function renderSteps(){
   ).join("");
 }
 
+function renderPhAdsTable(){
+  const rows = PH_ADS_ROWS.map(r=>
+    `<tr><td class="strong">${r.date}</td><td class="num">${r.ctr}</td><td class="num">${r.landing}</td><td class="num">${r.cart}</td><td class="num">${r.checkout}</td><td class="num">${r.purchase}</td></tr>`
+  ).join("");
+  document.getElementById("phAdsTable").innerHTML =
+    `<thead><tr><th>기준</th><th class="num">CTR</th><th class="num">랜딩뷰율</th><th class="num">담기율</th><th class="num">결제시작율</th><th class="num">구매전환율</th></tr></thead><tbody>${rows}</tbody>`;
+}
+function renderMkTable(){
+  const rows = MK_INAPP.map(r=>
+    `<tr><td class="strong">${r.date}</td><td class="num">${r.reach===null?"—":r.reach.toLocaleString()}</td><td class="num">${r.share}%</td><td class="num">${r.purchase}</td></tr>`
+  ).join("");
+  document.getElementById("mkTable").innerHTML =
+    `<thead><tr><th>날짜</th><th class="num">인앱 캠페인 Reach</th><th class="num">킥프레임 전체 Reach 중 비중</th><th class="num">구매전환율</th></tr></thead><tbody>${rows}</tbody>`;
+}
+function renderAdsSynth(){
+  document.getElementById("adsSynthRow").innerHTML = ADS_SYNTH.map(c=>
+    `<div class="card"><div class="card-label" style="color:${c.color};font-size:13.5px;">${c.title}</div><div class="card-note" style="font-size:12.5px;color:var(--text);">${c.body}</div></div>`
+  ).join("");
+}
+
 /* ================= THEME ================= */
 function applyTheme(theme){
   document.documentElement.setAttribute("data-theme", theme);
@@ -651,6 +932,19 @@ function renderAllCharts(){
   renderDailyChart(); renderSegChart(); renderRankChart();
   renderPhFunnelChart(); renderPhIndexChart();
   renderCrossDailyChart(); renderCrossSegChart(); renderCrossProdChart();
+  if (adsInitialized) renderAdsAllCharts();
+}
+
+/* ================= TABS ================= */
+let adsInitialized = false;
+function switchTab(name){
+  document.querySelectorAll(".tab-btn").forEach(b=> b.classList.toggle("active", b.dataset.tab===name));
+  document.getElementById("tab-site").classList.toggle("active", name==="site");
+  document.getElementById("tab-ads").classList.toggle("active", name==="ads");
+  if (name==="ads" && !adsInitialized){
+    renderAdsAllCharts();
+    adsInitialized = true;
+  }
 }
 
 /* ================= INIT ================= */
@@ -666,12 +960,21 @@ function init(){
   renderSteps();
   renderAllCharts();
 
+  renderAdsSummary();
+  renderPhAdsTable();
+  renderMkTable();
+  renderAdsSynth();
+
   let saved = "dark";
   try{ saved = localStorage.getItem("theme") || "dark"; }catch(e){}
   applyTheme(saved);
 
   document.getElementById("themeLightBtn").addEventListener("click", ()=>{ applyTheme("light"); renderAllCharts(); });
   document.getElementById("themeDarkBtn").addEventListener("click", ()=>{ applyTheme("dark"); renderAllCharts(); });
+
+  document.querySelectorAll(".tab-btn").forEach(b=>{
+    b.addEventListener("click", ()=> switchTab(b.dataset.tab));
+  });
 }
 init();
 </script>
